@@ -3,27 +3,12 @@ package chord;
 import java.util.HashMap;
 import java.util.Map;
 
-//ligar o head e tail X
-// hashmap em cada nó pq quando tiver ativo ele tem q reconhece-los 
-
-
-//TODO list:
-//	implementar o prev X
-//	implementar a ativação e X
-// 	implementar a associação aos nós ativos X
-//	implementar a busca X
-//	implementar a desativação
-//	Ajustes
-
-
-
-
 class Node {
     String data;
     Node next;
     Node prev;
-    Node nextAtivo;//próximo nó ativo
-    Node prevAtivo;//anterior nó ativo
+    Node nextAtivo; //próximo nó ativo
+    Node prevAtivo; //anterior ao nó ativo
     Map<Integer, Node> associados;
     boolean ativo;
 
@@ -56,38 +41,37 @@ class LinkedList {
         }
         
         if(!current.ativo) {
+            // Ativando um nó
         	current.ativo = true;
-        	 //percorre de trás pra frente salvando os associados até encontrar um ativo
+        	 //Percorre de trás pra frente salvando os associados até encontrar um ativo
             Node currentAtivo = current;
             
- 
-            
             while (!current.prev.ativo) {
-            	
     			currentAtivo.associados.put(hash(current.data), current);
     			current = current.prev;
     		}
+            
             currentAtivo.associados.put(hash(current.data), current);
             current = current.prev;
             
             current.nextAtivo = currentAtivo;
             currentAtivo.prevAtivo = current;
             
-            //percorre para a frente até encontrar um nó ativo, linka ele ao nó em questão e revê os associados 
+            //Percorre para a frente até encontrar um nó ativo, linka ele ao nó em questão e revê os associados 
             current = currentAtivo;
             while (!current.next.ativo) {
     			current = current.next;
     		}
             current = current.next;
-            //ligado os ponteitos ativos (Testar isso aqui, não sei se tá certo)
+            
+            //Ligado os ponteitos ativos
             current.prevAtivo = currentAtivo;
             currentAtivo.nextAtivo = current;
             
-            //Revendo os associados(dava pra otimizar isso aqui)
+            //Revendo os associados (dava pra otimizar isso aqui)
             currentAtivo = current;
-            
 
-            
+            current.associados.clear();
             while (!current.prev.ativo) {
             	
     			currentAtivo.associados.put(hash(current.data), current);
@@ -95,13 +79,12 @@ class LinkedList {
     		}
             currentAtivo.associados.put(hash(current.data), current);
             current = current.prev;
-            
+
             current.nextAtivo = currentAtivo;
             currentAtivo.prevAtivo = current;
         }else {
         	// Desativando um nó
         	current.ativo = false;
-        	
         	Node nextNode = current;
         	
             while (!nextNode.next.ativo) {
@@ -112,10 +95,7 @@ class LinkedList {
             // Passando os itens do hashmap do item desativado para o próximo nó ativo
             nextNode.associados.putAll(current.associados);
             current.associados.clear();
-        }
-        
-       
-        
+        }     
     }
     
     // Método para adicionar um novo nó no final da lista
@@ -160,36 +140,22 @@ class LinkedList {
     		hashValue += data.charAt(i);
 		}
     	
-    	return hashValue % 16;//Valor fixo 16 aqui! Talvez mudar
+    	return hashValue % 16; //Valor fixo 16 aqui
     }
     
 
     // Método para inserir um recurso em uma posição definida pelo hash
     public void insertByHash(String data) {
-    	
-//    	int hashValue = 0;
-//    	
-//    	for (int i = 0; i < data.length(); i++) {
-//    		hashValue += data.charAt(i);
-//		}
-//    	
+    	 	
     	int position = hash(data);
     			
         if (position < 0) {
             System.out.println("Posição inválida");
             return;
         }
-        
-//        if (position == 0) {
-//            Node newNode = new Node(data);
-////            newNode.next = head;
-//            head = newNode;
-//            return;
-//        }
 
         Node current = head;
         int currentPosition = 0;
-//        while (currentPosition < position - 1 && current != null) {
         while (currentPosition < position) {
             current = current.next;
             currentPosition++;
@@ -201,12 +167,6 @@ class LinkedList {
         }
 
         current.data = data;
-//        Node newNode = new Node(data);
-//        
-//        newNode.next = current.next;
-//        newNode.prev = current;
-//        current.next.prev = newNode;
-//        current.next = newNode;
         
     }
     
@@ -233,25 +193,23 @@ class LinkedList {
     	
     }
     
-    // Método para imprimir a lista encadeada
-    public void printList() {
+    // Método para imprimir a lista encadeada (anel)
+    public void printAnel() {
         Node current = head;
         System.out.print(current.data + " ");
         
         if(head.next != null) {
             current = head.next;
-            //se for head da prblema se for null funciona
+
             while (current != head) {
                 System.out.print(current.data + " ");
                 current = current.next;
             }
             System.out.println();
         }
-        
-
     }
     
-    public void printListHT() {
+    public void printAnelHT() {
         Node current = head;
         System.out.print(current.data + " ");
         
@@ -261,12 +219,10 @@ class LinkedList {
                 System.out.print(current.data + " ");
                 current = current.prev;
             }
-            
             System.out.println();
         }
-        
-
     }
+    
     public void printAssoc() {
     	Node current = head;
         System.out.println(current.data + ":\t" + "Status ativo: " + current.ativo + "\tAssociados: " + current.associados);
@@ -277,65 +233,57 @@ class LinkedList {
             	System.out.println(current.data + ":\t" + "Status ativo: " + current.ativo + "\tAssociados: " + current.associados);
                 current = current.next;
             }
-            
             System.out.println();
         }
-        
-    	
-    	
     }
 }
 
-
-
 public class Chord {
     public static void main(String[] args) {
-        LinkedList chord = new LinkedList();
+    	LinkedList chord = new LinkedList();
         
         //criei 16 nós pq sim
-        chord.append(" ");
-        chord.append("a");
-        chord.append("b");
-        chord.append("c");
-        chord.append("d");
-        chord.append("e");
-        chord.append("f");
-        chord.append("g");
-        chord.append("h");
-        chord.append("i");
-        chord.append("j");
-        chord.append("k");
-        chord.append("l");
-        chord.append("m");
-        chord.append("n");
-        chord.append("o");
+        for (int i = 0; i < 16; i++) {
+        	chord.append(" ");
+		}
  
-
-        chord.insertByHash("bb");
-        chord.insertByHash("bbb");
+        chord.insertByHash(" ");
+        chord.insertByHash("a");
+        chord.insertByHash("b");
         chord.insertByHash("c");
+        chord.insertByHash("d");
+        chord.insertByHash("e");
+        chord.insertByHash("f");
+        chord.insertByHash("g");
+        chord.insertByHash("h");
+        chord.insertByHash("i");
         chord.insertByHash("j");
+        chord.insertByHash("k");
+        chord.insertByHash("l");
+        chord.insertByHash("m");
+        chord.insertByHash("n");
+        chord.insertByHash("o");
         
-
         // Imprimindo a lista
         System.out.println("Lista encadeada:");
-        chord.printList();
-        chord.printListHT();
+        chord.printAnel();
+        chord.printAnelHT();
         
-        System.out.println("Nodo 2(indice 1): " + chord.head.next.data);
-        System.out.println("Nodo 2(indice 1) ativado: " + chord.head.next.ativo);
+        
         chord.ativacaoNodo(1);
-        chord.ativacaoNodo(6);
-        chord.ativacaoNodo(8);
+        chord.ativacaoNodo(6);    
         chord.ativacaoNodo(11);
         chord.ativacaoNodo(13);
-        System.out.println("Nodo 2(indice 1) ativado: " + chord.head.next.ativo);
-        
+
         chord.printAssoc();
         
         chord.ativacaoNodo(8);
-        
         chord.printAssoc();
-//       System.out.println("Endereço do nó: " + chord.buscar("n"));
+        
+        chord.ativacaoNodo(8);
+        chord.printAssoc();    
+        
+        System.out.println("Endereço do nó: " + chord.buscar("n"));
+        System.out.println("Endereço do nó: " + chord.buscar("a"));
     }
 }
